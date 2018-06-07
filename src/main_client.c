@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	strcpy(hostname, argv[2]);
 
 	//Starting the client
-	startClient(&sockfd, server, &serv_addr, (unsigned short)port, hostname);
+	startClient(&sockfd, server, &serv_addr, argv[1], hostname);
 
 	//Reading a message from the server
 	er = read(sockfd, &buffer, sizeof(buffer));
