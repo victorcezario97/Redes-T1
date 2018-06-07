@@ -21,18 +21,21 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	//Getting the arguments
 	port = atoi(argv[1]);
 	hostname = (char*)malloc(sizeof(argv[2])*sizeof(char));
 	strcpy(hostname, argv[2]);
 
+	//Starting the client
 	startClient(&sockfd, server, &serv_addr, (unsigned short)port, hostname);
 
+	//Reading a message from the server
 	er = read(sockfd, &buffer, sizeof(buffer));
 	if(er < 0){
 		printf("ERROR READ\n");
 		return -1;
 	}
-	
+
 	printf("%s\n", buffer);
 
 	return 0;

@@ -24,10 +24,13 @@ int main(int argc, char *argv[]){
 
 	port = atoi(argv[1]);
 
+	//Starting the server
 	startServer(&sockfd, &serv_addr, (unsigned short)port);
 
+	//Listening on the created socket
 	listen(sockfd, 5);
 
+	//Accepting the 2 clients
 	acceptClient(&cli_addr1, &clilen1, sockfd, &cli1_sockfd, CONMSG1);
 	acceptClient(&cli_addr2, &clilen2, sockfd, &cli2_sockfd, CONMSG2);
 
