@@ -64,7 +64,7 @@ int acceptClient(struct sockaddr_in *cli_addr, socklen_t *len, int sockfd, int *
 }
 
 //Sets up the client and connects to the server
-int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, char *port, char *hostname){
+int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, unsigned short port, char *hostname){
 	int er;
 	struct addrinfo hints, *result, *next_result;
 
@@ -81,7 +81,7 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 	hints.ai_flags = 0;
 	hints.ai_protocol = 0;
 
-	er = getaddrinfo(NULL, port, &hints, &result);
+	/*er = getaddrinfo(hostname, port, &hints, &result);
 	if(er <0){
 		printf("ERROR GETADDRINFO\n");
 		return -1;
@@ -99,12 +99,12 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 	if(next_result == NULL){
 		printf("ERROR CONNECT\n");
 		return -1;
-	}
+	}*/
 
 
 
 	//Getting the specified host
-	/*server = gethostbyname(hostname);
+	server = gethostbyname(hostname);
 	if(server == NULL){
 		printf("ERROR HOST\n");
 		return -1;
@@ -118,11 +118,11 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 	(*serv_addr).sin_port = htons(port);
 
 	//Attempting to connect to the server
-	//er = connect((*sockfd),(struct sockaddr *) serv_addr, sizeof((*serv_addr)));
+	er = connect((*sockfd),(struct sockaddr *) serv_addr, sizeof((*serv_addr)));
 	if(er < 0){
 		printf("ERROR CONNECT: %d\n", errno);
 		return -1;
-	}*/
+	}
 
 	return 0;
 }

@@ -5,6 +5,6 @@
 
 int startServer(int *, struct sockaddr_in *, unsigned short);
 int acceptClient(struct sockaddr_in *, socklen_t *, int, int *, char *);
-int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, char *port, char *hostname);
+int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, unsigned short port, char *hostname);
 
 #endif
