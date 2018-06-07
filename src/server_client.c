@@ -64,9 +64,8 @@ int acceptClient(struct sockaddr_in *cli_addr, socklen_t *len, int sockfd, int *
 }
 
 //Sets up the client and connects to the server
-int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, char *port, char *hostname){
+int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_addr, unsigned short port, char *hostname){
 	int er;
-	struct addrinfo hints, *result, *next_result;
 
 	//Creating the socket
 	(*sockfd) = socket(AF_INET, SOCK_STREAM, 0);
@@ -75,31 +74,8 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 		return -1;
 	}
 
-	bzero((char *)&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = 0;
-	hints.ai_protocol = 0;
-
-	er = getaddrinfo(NULL, port, &hints, &result);
-	if(er <0){
-		printf("ERROR GETADDRINFO\n");
-		return -1;
-	}
-
-	for(next_result = result; next_result != NULL; next_result = next_result->ai_next){
-		(*sockfd) = socket(next_result->ai_family, next_result->ai_socktype, next_result->ai_protocol);
-
-		if((*sockfd) < 0) continue;
-
-		er = connect((*sockfd), next_result->ai_addr, next_result->ai_addrlen);
-		if(er != -1) break;
-	}
-
-
-
 	//Getting the specified host
-	/*server = gethostbyname(hostname);
+	server = gethostbyname(hostname);
 	if(server == NULL){
 		printf("ERROR HOST\n");
 		return -1;
@@ -113,11 +89,11 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 	(*serv_addr).sin_port = htons(port);
 
 	//Attempting to connect to the server
-	//er = connect((*sockfd),(struct sockaddr *) serv_addr, sizeof((*serv_addr)));
+	er = connect((*sockfd),(struct sockaddr *) serv_addr, sizeof((*serv_addr)));
 	if(er < 0){
 		printf("ERROR CONNECT: %d\n", errno);
 		return -1;
-	}*/
+	}
 
 	return 0;
 }
