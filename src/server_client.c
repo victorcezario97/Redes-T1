@@ -96,11 +96,6 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 		if(er != -1) break;
 	}
 
-	if(next_result == NULL){
-		printf("ERROR CONNECT\n");
-		return -1;
-	}
-
 
 
 	//Getting the specified host
