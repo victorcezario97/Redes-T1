@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
 	startServer(&sockfd, &serv_addr, (unsigned short)port);
 
 	//Listening on the created socket
-	listen(sockfd, 5);
+	listen(sockfd, 1);
 
 	//Accepting the 2 clients
 	acceptClient(&cli_addr1, &clilen1, sockfd, &cli1_sockfd, CONMSG1);
