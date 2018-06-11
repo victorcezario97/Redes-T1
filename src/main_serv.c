@@ -108,13 +108,11 @@ void printOwnField(char **field, int player, int client){
 void printOpponentField(char **field, int player, int client){
 	char string[270] = "Campo player ";
 
-	//printf("Campo player %d\n", player);
 	sprintf(string +strlen(string), "%d", player);
 	strcat(string, "\n  A B C D E F G H I J\n");
 	for(int i = 0; i < LENGTH; i++){
-		// printf("%d  ", i+1);
 		sprintf(string + strlen(string), "%d", i);
-		strcat(string, "  ");
+		strcat(string, " ");
 		for(int j = 0; j < LENGTH; j++){
 			if(field[i][j] != 'N'){	// If it's not a ship.
 				if(field[i][j] == 'Y')
@@ -323,7 +321,7 @@ bool positionsLoop(char **field, int player, int client){
 
 	// Set submarines
 	printOwnField(field, player, client);
-	printf("Printou o mapa\n");
+
 	setShips(field, sub, 2, player, 4, client);
 
 	// Set contratorpedeiros player one
