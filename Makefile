@@ -7,3 +7,7 @@ cli:
 	./main_cli 51717 `hostname`
 clean:
 	rm -rf main_cli main_serv
+serv2:
+	./main_serv 8080
+cli2:
+	./main_cli 8080 `hostname`

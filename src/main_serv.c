@@ -100,8 +100,9 @@ void printOwnField(char **field, int player, int client){
 		strcat(string, "\n");
 	}
 	strcat(string, "\n");
-
 	int er = write((client), string, strlen(string));
+printf("print own after write\n");
+
 	if(er < 0) printf("ERROR WRITE\n");
 }
 
@@ -326,6 +327,7 @@ bool mainLoop(char **opponentField, int player, int client){
 bool positionsLoop(char **field, int player, int client){
 	char sub[20] = "submarino", cont[20] = "contratorpedeiro", tanq[20] = "navio-tanque", port[20] = "porta-aviao";
 	char string[7] = "Done";
+		printf("in posloop\n");
 
 	// Set submarines
 	printOwnField(field, player, client);
@@ -391,6 +393,7 @@ int main(int argc, char *argv[]){
 	// char **field, int player, int client
 	playerOneReady = positionsLoop(fieldOne, 1, cli1_sockfd);
 	playerTwoReady = positionsLoop(fieldTwo, 2, cli2_sockfd);
+		printf("aksndkasndka2\n");
 
 	while(playerOneReady == false || playerTwoReady == false);
 

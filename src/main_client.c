@@ -35,6 +35,10 @@ int main(int argc, char *argv[])
 	//Starting the client
 	startClient(&sockfd, server, &serv_addr, (unsigned short)port, hostname);
 
+	//Reading connection confirmation message
+	er = read(sockfd, &buffer, sizeof(buffer));
+	printf("%s\n", buffer);
+
 	while(positionsDone == false){
 		//Reading a message from the server
 		er = read(sockfd, &buffer, sizeof(buffer));
@@ -42,6 +46,7 @@ int main(int argc, char *argv[])
 			printf("ERROR READ\n");
 			return -1;
 		}
+		printf("%s\n", buffer);
 
 		strcpy(msgCompare, "Done");
 		// Compare
