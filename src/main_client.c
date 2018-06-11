@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 	printf("%s\n", buffer);
 
 	while(positionsDone == false){
+		printf("Esperando read cima\n");
 		//Reading a message from the server
 		er = read(sockfd, &buffer, sizeof(buffer));
 		if(er < 0){
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
 		//mostra o mapa OU Done
 		printf("%s\n", buffer);
 
+		printf("Esperando read baixo\n");
 		//Reading instructions
 		er = read(sockfd, &buffer2, sizeof(buffer2));
 		if(er < 0){
@@ -62,9 +64,10 @@ int main(int argc, char *argv[])
 			printf("Posicoes registradas com sucesso caralho!\n");
 			positionsDone = true;
 		} else {	// Input
+			printf("Esperando input\n");
 			//mostra as instrucoes de posicao
 			printf("%s\n", buffer2);
-
+			printf("Esperando scanf\n");
 			scanf("%s", input);
 			er = write(sockfd, input, strlen(input));
 			if(er < 0) printf("ERROR WRITE\n");
@@ -72,7 +75,7 @@ int main(int argc, char *argv[])
 	}
 	
 	while(gameOver == false){
-		//Reading map
+		//Reading map or error instruction
 		bzero(&buffer, sizeof(buffer));
 		er = read(sockfd, &buffer, sizeof(buffer));
 		if(er < 0){
@@ -83,31 +86,39 @@ int main(int argc, char *argv[])
 		printf("%s\n", buffer);
 		printf("PRIMEIRO.\n");
 
-		strcpy(msgCompare, "Aguarde o adversario\n");
-		// Player turn
-		if(((strncmp(buffer, msgCompare, 10)) != 0) && ((strncmp(buffer, "Voce", 4)) != 0)){
-			printf("Entrou no IF\n");
-			//Reading instructions
-			bzero(&buffer, sizeof(buffer));
-			er = read(sockfd, &buffer, sizeof(buffer));
-			if(er < 0){
-				printf("ERROR READ\n");
-				return -1;
-			}
-			printf("%s\n", buffer);
-			printf("SEGUNDO.\n");
+		//
+		if(buffer[0] == 'J' || buffer[0] == 'P'){
+			scanf("%s", input);
+			er = write((sockfd), input, strlen(input));
+			if(er < 0) printf("ERROR WRITE\n");
+		}
+		else{
+			strcpy(msgCompare, "Aguarde o adversario\n");
+			// Player turn
+			if(((strncmp(buffer, msgCompare, 10)) != 0) && ((strncmp(buffer, "Voce", 4)) != 0)){
+				printf("Entrou no IF\n");
+				//Reading instructions
+				bzero(&buffer, sizeof(buffer));
+				er = read(sockfd, &buffer, sizeof(buffer));
+				if(er < 0){
+					printf("ERROR READ\n");
+					return -1;
+				}
+				printf("%s\n", buffer);
+				printf("SEGUNDO.\n");
 
-			strcpy(msgCompare, "Parabens, player 1!\n");
-			strcpy(msgCompare2, "Parabens, player 2!\n");
-			strcpy(msgCompare3, "Voce perdeu!\n");
+				strcpy(msgCompare, "Parabens, player 1!\n");
+				strcpy(msgCompare2, "Parabens, player 2!\n");
+				strcpy(msgCompare3, "Voce perdeu!\n");
 
-			if(strcmp(buffer, msgCompare) == 0 || strcmp(buffer, msgCompare2) == 0 || 
-				strcmp(buffer, msgCompare3) == 0)
-				gameOver = true;
-			else{
-				scanf("%s", input);
-				er = write((sockfd), input, strlen(input));
-				if(er < 0) printf("ERROR WRITE\n");
+				if(strcmp(buffer, msgCompare) == 0 || strcmp(buffer, msgCompare2) == 0 || 
+					strcmp(buffer, msgCompare3) == 0)
+					gameOver = true;
+				else{
+					scanf("%s", input);
+					er = write((sockfd), input, strlen(input));
+					if(er < 0) printf("ERROR WRITE\n");
+				}
 			}
 		}
 	}

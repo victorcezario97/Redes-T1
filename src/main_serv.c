@@ -84,8 +84,7 @@ void printOwnField(char **field, int player, int client){
 	strcat(string, "\n  A B C D E F G H I J\n");
 
 	for(int i = 0; i < LENGTH; i++){
-		int arg = i+1;
-		sprintf(string + strlen(string), "%d", arg);
+		sprintf(string + strlen(string), "%d", i);
 		strcat(string, " ");
 		for(int j = 0; j < LENGTH; j++){
 			if(field[i][j] == 'N')
@@ -112,11 +111,9 @@ void printOpponentField(char **field, int player, int client){
 	//printf("Campo player %d\n", player);
 	sprintf(string +strlen(string), "%d", player);
 	strcat(string, "\n  A B C D E F G H I J\n");
-	printf("   A B C D E F G H I J\n");
 	for(int i = 0; i < LENGTH; i++){
 		// printf("%d  ", i+1);
-		int arg = i+1;
-		sprintf(string + strlen(string), "%d", arg);
+		sprintf(string + strlen(string), "%d", i);
 		strcat(string, "  ");
 		for(int j = 0; j < LENGTH; j++){
 			if(field[i][j] != 'N'){	// If it's not a ship.
@@ -246,14 +243,13 @@ void setShips(char **field, char ship[20], int size, int player, int rep, int cl
 				return;
 			}
 			linAux = input[0];
-			colAux = input[2];
-			orAux = input[4];
+			colAux = input[1];
+			orAux = input[2];
 
 			lineBegin = linAux - '0';
 			c = colAux;
 			or = orAux;
 			//scanf("%d %c %c", &lineBegin, &c, &or);
-			lineBegin--;
 			colBegin = getColumnIndex(c);
 			//printf("colBegin = %d\n", colBegin);
 			if(placeShip(field, lineBegin, colBegin, or, size)){		// Place and print the ship
@@ -296,9 +292,8 @@ bool mainLoop(char **opponentField, int player, int client){
 		}
 
 		line = input[0] - '0';
-		c = input[2];
+		c = input[1];
 		//scanf("%d %c", &line, &c);
-		line--;
 		col = getColumnIndex(c);
 
 		// Campo: O => campo livre		N => navios 	X => pedaço navio afundado	Y => mar atacado
@@ -416,7 +411,7 @@ int main(int argc, char *argv[]){
 
 			if(mainLoop(fieldTwo, 1, cli1_sockfd) == true) {
 				pointsOne++;
-				}
+			}
 			turn = 2;
 		}
 		else{
