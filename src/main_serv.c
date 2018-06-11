@@ -236,7 +236,7 @@ void setShips(char **field, char ship[20], int size, int player, int rep, int cl
 			strcat(string, " posicoes: ");
 
 			string[strlen(string)] = '\0';
-			// Writing at client
+			// Writing at client...das instrucoes
 			er = write((client), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
 			//Reading a message from the server
@@ -283,12 +283,12 @@ bool mainLoop(char **opponentField, int player, int client){
 
 	printOpponentField(opponentField, opponentPlayer, client);
 	while(validInput == false){
-		strcpy(string, "Digite as coordenadas da posicao a ser atacada: ");
+		strcpy(string, "Digite as coordenadas da posicao a ser atacada: \0");
 		er = write((client), string, strlen(string));
 		if(er < 0) printf("ERROR WRITE\n");
 		//printf("Digite as coordenadas da posicao a ser atacada: ");
 
-		//Reading a message from the server
+		//Reading ATTACK
 		er = read(client, &input, sizeof(input));
 		if(er < 0){
 			printf("ERROR READ\n");
@@ -300,8 +300,6 @@ bool mainLoop(char **opponentField, int player, int client){
 		//scanf("%d %c", &line, &c);
 		line--;
 		col = getColumnIndex(c);
-
-		printf("input = %s, line = %d, col = %d\n", input, line, col);
 
 		// Campo: O => campo livre		N => navios 	X => pedaço navio afundado	Y => mar atacado
 		if(line >= 0 && line <= 9 && col >= 0 && col <= 9){		// If it's a valid position
@@ -316,11 +314,11 @@ bool mainLoop(char **opponentField, int player, int client){
 					strcpy(string, "Voce errou otario!!!\n");
 					er = write((client), string, strlen(string));
 				}
-				printOpponentField(opponentField, opponentPlayer, client);
+				//printOpponentField(opponentField, opponentPlayer, client);
 				return true;
 			}
 			else{
-				strcpy(string, "Voce ja atacou esta posicao. Tente novamente.\n");
+				strcpy(string, "Ja foi atacada esta posicao. Tente novamente.\n");
 				er = write((client), string, strlen(string));
 				if(er < 0) printf("ERROR WRITE\n");
 			}
@@ -426,7 +424,7 @@ int main(int argc, char *argv[]){
 			er = write((cli1_sockfd), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
 
-			printOwnField(fieldTwo, 2, cli2_sockfd);
+			//printOwnField(fieldTwo, 2, cli2_sockfd);
 
 			if(mainLoop(fieldOne, 2, cli2_sockfd) == true)
 				pointsTwo++;
