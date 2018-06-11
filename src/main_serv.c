@@ -12,260 +12,9 @@
 #define bool int
 #define true 1
 #define false 0
-#define LENGTH 10
 #define TOTAL 30
 
-// Print the "name" of a column.
-int getColumnIndex(char c){
-	switch(c){
-		case 'A':
-			return 0;
-			break;
-		case 'B':
-			return 1;
-			break;
-		case 'C':
-			return 2;
-			break;
-		case 'D':
-			return 3;
-			break;
-		case 'E':
-			return 4;
-			break;
-		case 'F':
-			return 5;
-			break;
-		case 'G':
-			return 6;
-			break;
-		case 'H':
-			return 7;
-			break;
-		case 'I':
-			return 8;
-			break;
-		case 'J':
-			return 9;
-			break;
-	}
-	return -1;
-}
-
-// Set all the field's places as 'O'
-void resetField(char **field){
-	for(int i = 0; i < LENGTH; i++){
-		for(int j = 0; j < LENGTH; j++)
-			field[i][j] = 'O';
-	}
-}
-
-// Get an empty field
-char **getField(){
-	int i, j;
-
-	char **field = (char**)malloc(sizeof(char*) * LENGTH);
-
-	for(i = 0; i < LENGTH; i++)
-		field[i] = (char*)malloc(sizeof(char) * LENGTH);
-
-	for(i = 0; i < LENGTH; i++){
-		for(j = 0; j < LENGTH; j++)
-			field[i][j] = 'O';
-	}
-
-	return field;
-}
-
-// Print a field
-void printOwnField(char **field, int player, int client){
-	char string[270] = "Campo player ";
-	sprintf(string +strlen(string), "%d", player);
-	strcat(string, "\n  A B C D E F G H I J\n");
-
-	for(int i = 0; i < LENGTH; i++){
-		sprintf(string + strlen(string), "%d", i);
-		strcat(string, " ");
-		for(int j = 0; j < LENGTH; j++){
-			if(field[i][j] == 'N')
-				strcat(string, "N ");
-			else if(field[i][j] == 'Y')
-				strcat(string, "Y ");
-			else if(field[i][j] == 'X')
-				strcat(string, "X ");
-			else if(field[i][j] == 'O')
-				strcat(string, "O ");
-		}
-		strcat(string, "\n");
-	}
-	strcat(string, "\n");
-	int er = write((client), string, strlen(string));
-printf("print own after write\n");
-
-	if(er < 0) printf("ERROR WRITE\n");
-}
-
-void printOpponentField(char **field, int player, int client){
-	char string[270] = "Campo player ";
-
-	//printf("Campo player %d\n", player);
-	sprintf(string +strlen(string), "%d", player);
-	strcat(string, "\n  A B C D E F G H I J\n");
-	for(int i = 0; i < LENGTH; i++){
-		// printf("%d  ", i+1);
-		sprintf(string + strlen(string), "%d", i);
-		strcat(string, "  ");
-		for(int j = 0; j < LENGTH; j++){
-			if(field[i][j] != 'N'){	// If it's not a ship.
-				if(field[i][j] == 'Y')
-					strcat(string, "Y ");
-				else if(field[i][j] == 'X')
-					strcat(string, "X ");
-				else if(field[i][j] == 'O')
-					strcat(string, "O ");
-					//printf("%c ", field[i][j]);
-			}
-			else					// If it's a ship, prints as an empty place.
-				strcat(string, "O ");
-		}
-		strcat(string, "\n");
-	}
-	strcat(string, "\n");
-	string[strlen(string)] = '\0';
-
-	int er = write((client), string, strlen(string));
-	if(er < 0) printf("ERROR WRITE\n");
-}
-
-// Check if a ship can be placed in a given position. If yes, place it and return true. Otherwise, returns false.
-bool placeShip(char **field, int lineBegin, int colBegin, char direction, int size){
-	if(lineBegin >= 0 && lineBegin <= 9 && colBegin >= 0 && colBegin <= 9){
-		int lim;
-		switch(direction){
-			case 'C':	// Up
-				lim = lineBegin - size + 1;
-				if(lim < 0)
-					return false;
-
-				for(int i = lineBegin; i >= lim; i--){
-					if(field[i][colBegin] == 'N'){	// If the ship cannot be placed on this position and orientation.
-						for(int j = i + 1; j <= lineBegin; j++)	
-							field[j][colBegin] = 'O';
-						return false;
-					}
-					field[i][colBegin] = 'N';
-				}
-
-				return true;
-				break;
-
-			case 'B':	// Down
-				lim = lineBegin + size - 1;
-				if(lim > 9)
-					return false;
-
-				for(int i = lineBegin; i <= lim; i++){	
-					if(field[i][colBegin] == 'N'){	// If the ship cannot be placed on this position and orientation, then cancels.
-						for(int j = i - 1; j >= lineBegin; j--)
-							field[j][colBegin] = 'O';
-						return false;
-					}
-					field[i][colBegin] = 'N';
-				}
-
-				return true;
-				break;
-
-			case 'E':	// Left
-				lim = colBegin - size + 1;
-				if(lim < 0)
-					return false;
-
-				for(int i = colBegin; i >= lim; i--){	
-					if(field[lineBegin][i] == 'N'){	// If the ship cannot be placed on this position and orientation, then cancels.
-						for(int j = i + 1; j <= colBegin; j++)
-							field[lineBegin][j] = 'O';
-						return false;
-					}
-					field[lineBegin][i] = 'N';
-				}
-
-				return true;
-				break;
-
-			case 'D':	// Right
-				lim = colBegin + size - 1;
-				if(lim > 9)
-					return false;
-
-				for(int i = colBegin; i <= lim; i++){
-					if(field[lineBegin][i] == 'N'){	// If the ship cannot be placed on this position and orientation, then cancels.
-						for(int j = i - 1; j >= colBegin; j--)
-							field[lineBegin][j] = 'O';
-						return false;
-					}
-					field[lineBegin][i] = 'N';
-				} 
-				return true;
-				break;
-		}
-	}
-	return false;
-}
-
-// Set a player's ship
-void setShips(char **field, char ship[20], int size, int player, int rep, int client){
-	int lineBegin, colBegin;
-	char c, or, input[10], linAux, colAux, orAux;
-	char string[500];
-	bool validInput;
-	int er;
-
-	for(int i = 0; i < rep; i++){
-		validInput = false;
-		strcpy(string, "Diga a primeira coordenada do ");
-		while(!validInput){
-			sprintf(string + strlen(string), "%d", i+1);
-			strcat(string, "o. ");
-			strcat(string, ship);
-			strcat(string, " e sua orientação: ['C']: cima/ ['B']: baixo/ ['D']: direita/ ['E']: esquerda. Ele ocupa ");
-			sprintf(string + strlen(string), "%d", size);
-			strcat(string, " posicoes: ");
-
-			string[strlen(string)] = '\0';
-			// Writing at client...das instrucoes
-			er = write((client), string, strlen(string));
-			if(er < 0) printf("ERROR WRITE\n");
-			//Reading a message from the server
-			er = read(client, &input, sizeof(input));
-			if(er < 0){
-				printf("ERROR READ\n");
-				return;
-			}
-			linAux = input[0];
-			colAux = input[1];
-			orAux = input[2];
-
-			lineBegin = linAux - '0';
-			c = colAux;
-			or = orAux;
-			//scanf("%d %c %c", &lineBegin, &c, &or);
-			colBegin = getColumnIndex(c);
-			//printf("colBegin = %d\n", colBegin);
-			if(placeShip(field, lineBegin, colBegin, or, size)){		// Place and print the ship
-				validInput = true;
-				printOwnField(field, player, client);
-			}
-			else{
-				// Writing at client
-				strcpy(string, "Coordenadas invalidas!\n");
-				er = write((client), string, strlen(string));
-				if(er < 0) printf("ERROR WRITE\n");
-			}
-		}
-	}
-}
-
+/*
 // Returns true if a piece of a ship was sinked. Otherwise, returns false.
 bool mainLoop(char **opponentField, int player, int client){
 	int opponentPlayer, line, col, er;
@@ -325,36 +74,44 @@ bool mainLoop(char **opponentField, int player, int client){
 	}
 	return false;
 }
-
+*/
 //setShips(char **field, char ship[20], int size, int player, int rep)
-bool positionsLoop(char **field, int player, int client){
-	char sub[20] = "submarino", cont[20] = "contratorpedeiro", tanq[20] = "navio-tanque", port[20] = "porta-aviao";
-	char string[40] = "Done\0";
 
-	// Set submarines
-	printOwnField(field, player, client);
-	printf("Printou o mapa\n");
-	setShips(field, sub, 2, player, 2, client);
 
-	/*
-	// Set contratorpedeiros player one
-	printOwnField(field, player, client);
-	setShips(field, cont, 3, player, 3, client);
+// Get an empty field
+char **getField(){
+	int i, j;
 
-	// Set navios-tanque player one
-	printOwnField(field, player, client);
-	setShips(field, tanq, 4, player, 2, client);
+	char **field = (char**)malloc(sizeof(char*) * 10);
 
-	// Set porta-aviões player one
-	printOwnField(field, player, client);
-	setShips(field, port, 5, player, 1, client);
-	*/
+	for(i = 0; i < 10; i++)
+		field[i] = (char*)malloc(sizeof(char) * 10);
 
-	//strcpy(string, "Por favor, digite uma posicao valida.\n");
-	int er = write((client), string, strlen(string));
-	if(er < 0) printf("ERROR WRITE\n");
+	for(i = 0; i < 10; i++){
+		for(j = 0; j < 10; j++)
+			field[i][j] = 'O';
+	}
 
-	return true;
+	return field;
+}
+
+void convertBack(char *s, char **f){
+	for(int i=0;i<10; i++){
+		for(int j=0; j<10; j++){
+			f[i][j] = s[(10*i) + j];			
+		}
+	}
+}
+
+void printF(char **f){
+	printf("  A B C D E F G H I J\n");
+	for(int i=0; i<10; i++){
+		for (int j=0; j<10; j++){
+			if(j==0) printf("%d ", i);
+			printf("%c ", f[i][j]);
+		}
+		printf("\n");
+	}
 }
 
 int main(int argc, char *argv[]){
@@ -363,12 +120,13 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in serv_addr, cli_addr1, cli_addr2;
 	socklen_t clilen1, clilen2;
 	int port;
+	char **field1, **field2, *s = (char*)malloc(100*sizeof(char));
 
 	int er;
 
-	int pointsOne = 0, pointsTwo = 0, turn = 1;
-	bool playerOneReady = false, playerTwoReady = false;
-	char string[30];
+	//int pointsOne = 0, pointsTwo = 0, turn = 1;
+	//bool playerOneReady = false, playerTwoReady = false;
+	//char string[30];
 
 	if(argc < 2){
 		printf("usage %s: port\n", argv[0]);
@@ -384,10 +142,36 @@ int main(int argc, char *argv[]){
 	listen(sockfd, 5);
 
 	//Accepting the 2 clients
-	acceptClient(&cli_addr1, &clilen1, sockfd, &cli1_sockfd, CONMSG1);
-	acceptClient(&cli_addr2, &clilen2, sockfd, &cli2_sockfd, CONMSG2);
+	acceptClient(&cli_addr1, &clilen1, sockfd, &cli1_sockfd, "ok");
+	//Telling the first client he is player 1
+
+	acceptClient(&cli_addr2, &clilen2, sockfd, &cli2_sockfd, "ok");
+	//Telling the second client he is player 2
+	
+
+	er = write(cli1_sockfd, "1", 1);
+	if(er<0) printf("ERRO WRITE\n");
+	er = write(cli2_sockfd, "2", 1);
+	if(er<0) printf("ERRO WRITE\n");
+
+	field1 = getField();
+	field2 = getField();
+
+	er = read(cli1_sockfd, s, 100);
+	if(er < 0) printf("ERROR READFIELD\n");
+	convertBack(s, field1);
+
+	er = read(cli2_sockfd, s, 100);
+	if(er < 0) printf("ERROR READFIELD\n");
+	convertBack(s, field2);
+	//printf("%c\n", field1[0][0]);
+
+	er = write(cli1_sockfd, "ok\0", 3);
+	er = write(cli2_sockfd, "ok\0", 3);
 
 
+
+/*
 	// Starting game
 	char **fieldOne = getField();
 	char **fieldTwo = getField();
@@ -450,6 +234,6 @@ int main(int argc, char *argv[]){
 		er = write((cli1_sockfd), string, strlen(string));
 		if(er < 0) printf("ERROR WRITE\n");
 	}
-
+*/
 	return 0;
 }
