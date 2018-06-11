@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	int sockfd, port, er;
 	struct sockaddr_in serv_addr;
 	struct hostent *server = NULL;
-	char buffer[300], *hostname, input[10], msgCompare[40], msgCompare2[40], msgCompare3[40];
+	char buffer[500], buffer2[500], *hostname, input[10], msgCompare[40], msgCompare2[40], msgCompare3[40];
 	bool positionsDone = false, gameOver = false;
 	
 
@@ -46,7 +46,16 @@ int main(int argc, char *argv[])
 			printf("ERROR READ\n");
 			return -1;
 		}
+		//mostra o mapa
 		printf("%s\n", buffer);
+
+		er = read(sockfd, &buffer2, sizeof(buffer));
+		if(er < 0){
+			printf("ERROR READ\n");
+			return -1;
+		}
+		//mostra as instrucoes de posicao
+		printf("%s\n", buffer2);
 
 		strcpy(msgCompare, "Done");
 		// Compare
@@ -54,7 +63,8 @@ int main(int argc, char *argv[])
 			positionsDone = true;
 		else{	// Input
 			scanf("%s", input);
-			er = write((sockfd), input, strlen(input));
+			printf("input = %s\n", input);
+			er = write(sockfd, input, strlen(input));
 			if(er < 0) printf("ERROR WRITE\n");
 		}
 	}
