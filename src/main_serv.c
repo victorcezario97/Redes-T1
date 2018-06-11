@@ -316,6 +316,7 @@ bool mainLoop(char **opponentField, int player, int client){
 					strcpy(string, "Voce errou otario!!!\n");
 					er = write((client), string, strlen(string));
 				}
+				printOpponentField(opponentField, opponentPlayer, client);
 				return true;
 			}
 			else{
@@ -335,7 +336,7 @@ bool mainLoop(char **opponentField, int player, int client){
 //setShips(char **field, char ship[20], int size, int player, int rep)
 bool positionsLoop(char **field, int player, int client){
 	char sub[20] = "submarino", cont[20] = "contratorpedeiro", tanq[20] = "navio-tanque", port[20] = "porta-aviao";
-	char string[40] = "Done";
+	char string[40] = "Done\0";
 
 	// Set submarines
 	printOwnField(field, player, client);
@@ -356,7 +357,7 @@ bool positionsLoop(char **field, int player, int client){
 	setShips(field, port, 5, player, 1, client);
 	*/
 
-	strcpy(string, "Por favor, digite uma posicao valida.\n");
+	//strcpy(string, "Por favor, digite uma posicao valida.\n");
 	int er = write((client), string, strlen(string));
 	if(er < 0) printf("ERROR WRITE\n");
 
@@ -408,21 +409,24 @@ int main(int argc, char *argv[]){
 	while(playerOneReady == false || playerTwoReady == false);
 
 	// Main loop
-	while(pointsOne < 30 && pointsTwo < 30){
+	while(pointsOne < 2 && pointsTwo < 2){
 		strcpy(string, "Aguarde o adversario\n");
 		if(turn == 1){
 			// Prints wait
 			er = write((cli2_sockfd), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
 
-			if(mainLoop(fieldTwo, 1, cli1_sockfd) == true)
+			if(mainLoop(fieldTwo, 1, cli1_sockfd) == true) {
 				pointsOne++;
+				}
 			turn = 2;
 		}
 		else{
 			// Prints wait
 			er = write((cli1_sockfd), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
+
+			printOwnField(fieldTwo, 2, cli2_sockfd);
 
 			if(mainLoop(fieldOne, 2, cli2_sockfd) == true)
 				pointsTwo++;
@@ -431,7 +435,7 @@ int main(int argc, char *argv[]){
 	}
 
 	// End game
-	if(pointsOne == 30){
+	if(pointsOne == 2){
 		strcpy(string, "Parabens, player 1!\n");
 		// Prints wait
 		er = write((cli1_sockfd), string, strlen(string));
