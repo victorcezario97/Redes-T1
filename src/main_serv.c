@@ -319,7 +319,7 @@ bool mainLoop(char **opponentField, int player, int client){
 //setShips(char **field, char ship[20], int size, int player, int rep)
 bool positionsLoop(char **field, int player, int client){
 	char sub[20] = "submarino", cont[20] = "contratorpedeiro", tanq[20] = "navio-tanque", port[20] = "porta-aviao";
-	char string[40] = "Done";
+	char string[4] = "Done";
 
 	// Set submarines
 	printOwnField(field, player, client);
@@ -336,7 +336,7 @@ bool positionsLoop(char **field, int player, int client){
 	setShips(field, port, 5, player, 1, client);
 	
 	// Finish positioning ships
-	int er = write((client), string, strlen(string));
+	int er = write((client), string, 4);
 	if(er < 0) printf("ERROR WRITE\n");
 
 	return true;
@@ -389,7 +389,7 @@ int main(int argc, char *argv[]){
 
 	strcpy(string, "Aguarde o adversario\n");
 	// Main loop
-	while(pointsOne < 2 && pointsTwo < 2){
+	while(pointsOne < 30 && pointsTwo < 30){
 		if(turn == 1){
 			// Prints wait
 			er = write((cli2_sockfd), string, strlen(string));

@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 	// Read and write - positionsLoop function
 	while(positionsDone == false){
 		//Reading a message.
+		bzero(buffer, 500);
 		int er = read(sockfd, &buffer, sizeof(buffer));
 		if(er < 0){
 			printf("ERROR READ\n");
@@ -58,7 +59,8 @@ int main(int argc, char *argv[])
 			er = write(sockfd, input, strlen(input));
 			if(er < 0) printf("ERROR WRITE\n");
 		}
-		else if(strncmp(buffer2, msgCompare, 3) == 0) {
+		//else if(strncmp(buffer2, msgCompare, 3) == 0) {
+		else if(strstr(buffer, "Done") != NULL){
 			printf("Posicoes registradas com sucesso!\n");
 			positionsDone = true;
 		}
@@ -69,7 +71,6 @@ int main(int argc, char *argv[])
 				printf("ERROR READ\n");
 				return -1;
 			}
-
 			strcpy(msgCompare, "Done");
 			// Compare
 			if(strncmp(buffer2, msgCompare, 3) == 0) {
