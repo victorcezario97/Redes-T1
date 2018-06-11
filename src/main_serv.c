@@ -324,7 +324,7 @@ bool positionsLoop(char **field, int player, int client){
 	// Set submarines
 	printOwnField(field, player, client);
 	printf("Printou o mapa\n");
-	setShips(field, sub, 2, player, 2, client);
+	setShips(field, sub, 2, player, 4, client);
 
 	// Set contratorpedeiros player one
 	setShips(field, cont, 3, player, 3, client);
