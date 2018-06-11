@@ -440,6 +440,9 @@ int main(int argc, char *argv[]){
 	}
 	free(fieldOne);
 	free(fieldTwo);
+
+	close(cli1_sockfd);
+	close(cli2_sockfd);
 	
 	return 0;
 }
