@@ -99,9 +99,9 @@ void printOwnField(char **field, int player, int client){
 		strcat(string, "\n");
 	}
 	strcat(string, "\n");
+	// Write at client
 	int er = write((client), string, strlen(string));
-printf("print own after write\n");
-
+	
 	if(er < 0) printf("ERROR WRITE\n");
 }
 
@@ -123,7 +123,6 @@ void printOpponentField(char **field, int player, int client){
 					strcat(string, "X ");
 				else if(field[i][j] == 'O')
 					strcat(string, "O ");
-					//printf("%c ", field[i][j]);
 			}
 			else					// If it's a ship, prints as an empty place.
 				strcat(string, "O ");
@@ -235,9 +234,10 @@ void setShips(char **field, char ship[20], int size, int player, int rep, int cl
 			strcat(string, " posicoes: ");
 
 			string[strlen(string)] = '\0';
-			// Writing at client...das instrucoes
+			// Writing at client
 			er = write((client), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
+
 			//Reading a message from the server
 			er = read(client, &input, sizeof(input));
 			if(er < 0){
@@ -248,22 +248,18 @@ void setShips(char **field, char ship[20], int size, int player, int rep, int cl
 			colAux = input[1];
 			orAux = input[2];
 
+			// Convert input
 			lineBegin = linAux - '0';
 			c = colAux;
 			or = orAux;
-			//scanf("%d %c %c", &lineBegin, &c, &or);
 			colBegin = getColumnIndex(c);
-			//printf("colBegin = %d\n", colBegin);
+
 			if(placeShip(field, lineBegin, colBegin, or, size)){		// Place and print the ship
 				validInput = true;
 				printOwnField(field, player, client);
 			}
-			else{
-				// Writing at client
+			else
 				strcpy(string, "Coordenadas invalidas!\n");
-				//er = write((client), string, strlen(string));
-				//if(er < 0) printf("ERROR WRITE\n");
-			}
 		}
 	}
 }
@@ -282,11 +278,9 @@ bool mainLoop(char **opponentField, int player, int client){
 	printOpponentField(opponentField, opponentPlayer, client);
 	strcpy(string, "");
 	while(validInput == false){
-		//strcpy(string, "Digite as coordenadas da posicao a ser atacada: \0");
 		strcat(string, "Digite as coordenadas da posicao a ser atacada: \0");
 		er = write((client), string, strlen(string));
 		if(er < 0) printf("ERROR WRITE\n");
-		//printf("Digite as coordenadas da posicao a ser atacada: ");
 
 		//Reading ATTACK
 		er = read(client, &input, sizeof(input));
@@ -295,37 +289,29 @@ bool mainLoop(char **opponentField, int player, int client){
 			return -1;
 		}
 
+		// Convert input
 		line = input[0] - '0';
 		c = input[1];
-		//scanf("%d %c", &line, &c);
 		col = getColumnIndex(c);
 
-		// Campo: O => campo livre		N => navios 	X => pedaço navio afundado	Y => mar atacado
 		if(line >= 0 && line <= 9 && col >= 0 && col <= 9){		// If it's a valid position
 			if(opponentField[line][col] != 'X' && opponentField[line][col] != 'Y'){	// If it wasn't already attacked
-				if(opponentField[line][col] == 'N') {
+				if(opponentField[line][col] == 'N') {	// If a piece of a ship was attacked
 					opponentField[line][col] = 'X';
-					strcpy(string, "Voce acertou um navio caralho!!!!\n");
+					strcpy(string, "Voce acertou um navio!\n");
 					er = write((client), string, strlen(string));
 				}
-				else {
+				else {		// If the sea was attacked
 					opponentField[line][col] = 'Y';
-					strcpy(string, "Voce errou otario!!!\n");
+					strcpy(string, "Voce errou!\n");
 					er = write((client), string, strlen(string));
 				}
-				//printOpponentField(opponentField, opponentPlayer, client);
 				return true;
 			}
-			else{
+			else
 				strcpy(string, "Ja foi atacada esta posicao. Tente novamente.\n");
-				//er = write((client), string, strlen(string));
-				//if(er < 0) printf("ERROR WRITE\n");
-			}
-		} else {
+		} else 
 			strcpy(string, "Por favor, digite uma posicao valida.\n");
-			//er = write((client), string, strlen(string));
-		}
-		//if(er < 0) printf("ERROR WRITE\n");
 	}
 	return false;
 }
@@ -340,21 +326,16 @@ bool positionsLoop(char **field, int player, int client){
 	printf("Printou o mapa\n");
 	setShips(field, sub, 2, player, 2, client);
 
-	
 	// Set contratorpedeiros player one
-	//printOwnField(field, player, client);
 	setShips(field, cont, 3, player, 3, client);
 
 	// Set navios-tanque player one
-	//printOwnField(field, player, client);
 	setShips(field, tanq, 4, player, 2, client);
 
 	// Set porta-aviões player one
-	//printOwnField(field, player, client);
 	setShips(field, port, 5, player, 1, client);
 	
-
-	//strcpy(string, "Por favor, digite uma posicao valida.\n");
+	// Finish positioning ships
 	int er = write((client), string, strlen(string));
 	if(er < 0) printf("ERROR WRITE\n");
 
@@ -396,10 +377,11 @@ int main(int argc, char *argv[]){
 	char **fieldOne = getField();
 	char **fieldTwo = getField();
 
+	// Reset all fields
 	resetField(fieldOne);
 	resetField(fieldTwo);
 
-	// char **field, int player, int client
+	// Set ships positions
 	playerOneReady = positionsLoop(fieldOne, 1, cli1_sockfd);
 	playerTwoReady = positionsLoop(fieldTwo, 2, cli2_sockfd);
 
@@ -413,7 +395,7 @@ int main(int argc, char *argv[]){
 			er = write((cli2_sockfd), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
 
-			if(mainLoop(fieldTwo, 1, cli1_sockfd) == true) {
+			if(mainLoop(fieldTwo, 1, cli1_sockfd) == true) {	// Main loop player 1
 				pointsOne++;
 			}
 			turn = 2;
@@ -423,16 +405,14 @@ int main(int argc, char *argv[]){
 			er = write((cli1_sockfd), string, strlen(string));
 			if(er < 0) printf("ERROR WRITE\n");
 
-			//printOwnField(fieldTwo, 2, cli2_sockfd);
-
-			if(mainLoop(fieldOne, 2, cli2_sockfd) == true)
+			if(mainLoop(fieldOne, 2, cli2_sockfd) == true)		// Main loop player 2
 				pointsTwo++;
 			turn = 1;
 		}
 	}
 
 	// End game
-	if(pointsOne == 2){
+	if(pointsOne == 30){
 		strcpy(string, "Parabens, player 1!\n");
 		// Prints wait
 		er = write((cli1_sockfd), string, strlen(string));
@@ -455,5 +435,13 @@ int main(int argc, char *argv[]){
 		if(er < 0) printf("ERROR WRITE\n");
 	}
 
+	// Free memory
+	for(int i =0; i < LENGTH; i++){
+		free(fieldOne[i]);
+		free(fieldTwo[i]);
+	}
+	free(fieldOne);
+	free(fieldTwo);
+	
 	return 0;
 }
