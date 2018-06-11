@@ -13,6 +13,7 @@
 #define true 1
 #define false 0
 
+
 int main(int argc, char *argv[])
 {
 	int sockfd, port, er;
@@ -41,41 +42,57 @@ int main(int argc, char *argv[])
 
 	while(positionsDone == false){
 		printf("Esperando read cima\n");
-		//Reading a message from the server
-		er = read(sockfd, &buffer, sizeof(buffer));
+		//Reading a message.
+		int er = read(sockfd, &buffer, sizeof(buffer));
 		if(er < 0){
 			printf("ERROR READ\n");
 			return -1;
 		}
-		//mostra o mapa OU Done
+		//Prints message
 		printf("%s\n", buffer);
 
-		printf("Esperando read baixo\n");
-		//Reading instructions
-		er = read(sockfd, &buffer2, sizeof(buffer2));
-		if(er < 0){
-			printf("ERROR READ\n");
-			return -1;
-		}
-
-		strcpy(msgCompare, "Done");
-		// Compare
-		if(strncmp(buffer2, msgCompare, 3) == 0) {
-			printf("Posicoes registradas com sucesso caralho!\n");
-			positionsDone = true;
-		} else {	// Input
-			printf("Esperando input\n");
-			//mostra as instrucoes de posicao
-			printf("%s\n", buffer2);
-			printf("Esperando scanf\n");
+		int len = strlen(buffer);
+		
+		if(len > 300 || (buffer[0] == 'C' && buffer[1] == 'o')){
 			scanf("%s", input);
 			er = write(sockfd, input, strlen(input));
 			if(er < 0) printf("ERROR WRITE\n");
 		}
+		else if(strncmp(buffer2, msgCompare, 3) == 0) {
+			printf("Posicoes registradas com sucesso caralho!\n");
+			positionsDone = true;
+		}
+		else{
+			printf("Esperando read baixo\n");
+			//Reading instructions
+			er = read(sockfd, &buffer2, sizeof(buffer2));
+			if(er < 0){
+				printf("ERROR READ\n");
+				return -1;
+			}
+
+			strcpy(msgCompare, "Done");
+			// Compare
+			if(strncmp(buffer2, msgCompare, 3) == 0) {
+				printf("Posicoes registradas com sucesso caralho!\n");
+				positionsDone = true;
+			} else {	// Input
+				//mostra as instrucoes de posicao
+				printf("%s\n", buffer2);
+				printf("Esperando scanf\n");
+				scanf("%s", input);
+				er = write(sockfd, input, strlen(input));
+				if(er < 0) printf("ERROR WRITE\n");
+			}
+			bzero(&buffer2, sizeof(buffer2));
+		}
+		bzero(&buffer, sizeof(buffer));
+		
 	}
 	
 	while(gameOver == false){
 		//Reading map or error instruction
+		printf("Esperando read cima\n");
 		bzero(&buffer, sizeof(buffer));
 		er = read(sockfd, &buffer, sizeof(buffer));
 		if(er < 0){
@@ -83,11 +100,12 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 		//print do mapa
-		printf("%s\n", buffer);
+		printf("Buffer: %s\n", buffer);
 		printf("PRIMEIRO.\n");
 
 		//
-		if(buffer[0] == 'J' || buffer[0] == 'P'){
+		if(buffer[0] =='J' || buffer[0] == 'P' || (buffer[0] == 'C' && buffer[1] == 'a')){
+			printf("Esperando scanf primeiro if\n");
 			scanf("%s", input);
 			er = write((sockfd), input, strlen(input));
 			if(er < 0) printf("ERROR WRITE\n");
@@ -96,8 +114,9 @@ int main(int argc, char *argv[])
 			strcpy(msgCompare, "Aguarde o adversario\n");
 			// Player turn
 			if(((strncmp(buffer, msgCompare, 10)) != 0) && ((strncmp(buffer, "Voce", 4)) != 0)){
-				printf("Entrou no IF\n");
+				//printf("Entrou no IF\n");
 				//Reading instructions
+				printf("Esperando read in if\n");
 				bzero(&buffer, sizeof(buffer));
 				er = read(sockfd, &buffer, sizeof(buffer));
 				if(er < 0){
@@ -115,6 +134,7 @@ int main(int argc, char *argv[])
 					strcmp(buffer, msgCompare3) == 0)
 					gameOver = true;
 				else{
+					printf("Esperando scanf\n");
 					scanf("%s", input);
 					er = write((sockfd), input, strlen(input));
 					if(er < 0) printf("ERROR WRITE\n");

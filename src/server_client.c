@@ -97,4 +97,18 @@ int startClient(int *sockfd, struct hostent *server, struct sockaddr_in *serv_ad
 
 	return 0;
 }
+/*
+void readMessage(int sockfd, char buffer[500]){
+	//Reading a message.
+	int er = read(sockfd, &buffer, sizeof(buffer));
+	if(er < 0){
+		printf("ERROR READ\n");
+		return -1;
+	}
+	//Prints message
+	printf("%s\n", buffer);
+}
 
+void writeMessage(int sockfd, char buffer[500]){
+
+}*/
